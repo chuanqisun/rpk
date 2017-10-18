@@ -1,0 +1,10 @@
+{
+  "name": "rpk-event-hub",
+  "version": "0.0.2",
+  "description": "rapid-prototyping-kit: event-hub",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chuanqi Sun",
+  "license": "MIT"
+}
