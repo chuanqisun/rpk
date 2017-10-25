@@ -1,0 +1,11 @@
+{
+  "name": "rpk",
+  "version": "0.0.1",
+  "description": "rapid prototyping kit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/henrysun918/rpk.git"
+  },
+  "author": "Chuanqi Sun",
+  "license": "MIT"
+}
