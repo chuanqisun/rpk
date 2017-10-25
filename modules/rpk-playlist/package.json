@@ -1,7 +1,7 @@
 {
-  "name": "rpk-renderer",
-  "version": "0.0.3",
-  "description": "minimal html template rendering engine",
+  "name": "rpk-playlist",
+  "version": "0.0.1",
+  "description": "a playlist data structure",
   "repository": {
     "type": "git",
     "url": "https://github.com/henrysun918/rpk.git"
