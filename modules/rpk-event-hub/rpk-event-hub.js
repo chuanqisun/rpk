@@ -17,7 +17,7 @@ window.rpk.EventHub = (function() {
     }
 
     EventHub.prototype.unsubscribe = function(channel, subscriber) {
-        let i = this.channels[channel].indexOf(subscriber);
+        const i = this.channels[channel].indexOf(subscriber);
         if (i > -1) {
             this.channels[channel].splice(i, 1);
         }
