@@ -1,0 +1,28 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Cursor [PROTOTYPE]</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h2>view</h2>
+    <div id="rendered-player"></div>
+
+    <h2>native</h2>
+    <audio id="cursor-player" controls></audio>
+
+    <h2>debug</h2>
+    <button onclick="load(1)">load src 1</button>
+    <button onclick="load(2)">load src 2</button>
+
+    <script src="lib.js"></script>
+    <script src="player-view.js"></script>
+    <script src="player-controller.js"></script>
+    <script src="playlist-controller.js"></script>
+    <script src="main.js"></script>
+    <header class="header"></header>
+</body>
+</html>
