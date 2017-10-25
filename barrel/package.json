@@ -7,5 +7,10 @@
     "url": "https://github.com/henrysun918/rpk.git"
   },
   "author": "Chuanqi Sun",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "rpk-event-hub": "0.0.4",
+    "rpk-playlist": "0.0.1",
+    "rpk-renderer": "0.0.3"
+  }
 }
