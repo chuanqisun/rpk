@@ -1,6 +1,6 @@
 {
   "name": "rpk-renderer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "minimal html template rendering engine",
   "repository": {
     "type": "git",
