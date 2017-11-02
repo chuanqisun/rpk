@@ -32,8 +32,14 @@ window.rpk.EventHub = (function() {
             return;
         }
 
+        let handlers = []; // save all handlers to prevent one handler deletes another by unsubscribing
+
         for (let i = 0; i < this.channels[channel].length; i++) {
-            this.channels[channel][i](event);
+            handlers.push(this.channels[channel][i]);
+        }
+
+        for (let i = 0; i < handlers.length; i++) {
+            handlers[i](event);
         }
     }
 
