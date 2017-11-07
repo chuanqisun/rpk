@@ -29,6 +29,12 @@ const CursorPlayerController = (function() {
             })
         }.bind(this);
 
+        this.nativePlayer.onvolumechange = function (event) {
+            this.updateView({
+                volume: event.target.volume,
+            });
+        }.bind(this);
+
         this.nativePlayer.onplay = function (event) {
             this.updateView({
                 isPlaying: this.state.isPlaying = true,
@@ -42,7 +48,8 @@ const CursorPlayerController = (function() {
         }.bind(this);
 
         this.nativePlayer.onended = function (event) {
-            // TODO auto play next in queue
+            eventHub.publish(CS_REQUEST_AUTO_NEXT);
+            eventHub.publish(CS_SEEK_INTERRUPT);
         }.bind(this);
 
         // hookup events
@@ -54,6 +61,7 @@ const CursorPlayerController = (function() {
         }.bind(this));
 
         eventHub.subscribe(CS_SEEK, this.seek.bind(this));
+        eventHub.subscribe(CS_VOLUME_CHANGE, this.volumeChange.bind(this));
 
         eventHub.subscribe(CS_PLAY_TRACK, this.playTrack.bind(this));
     }
@@ -94,6 +102,10 @@ const CursorPlayerController = (function() {
         this.nativePlayer.currentTime = this.state.duration * percentage;
         if (!this.state.isPlaying && percentage < 1) // don't play if seek beyond the end
             this.play();
+    }
+
+    CursorPlayerController.prototype.volumeChange = function(volume) {
+        this.nativePlayer.volume = Math.max(0, Math.min(volume, 1));
     }
 
     return CursorPlayerController;

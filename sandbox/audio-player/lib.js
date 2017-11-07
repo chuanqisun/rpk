@@ -1,11 +1,146 @@
 // event hub
-// https://github.com/henrysun918/rpk/blob/master/modules/rpk-event-hub/rpk-event-hub.js
-"use strict";window.rpk===void 0&&(window.rpk={}),window.rpk.EventHub=function(){function a(){this.channels={}}return a.prototype.subscribe=function(b,c){void 0===this.channels[b]&&(this.channels[b]=[]),this.channels[b].push(c)},a.prototype.unsubscribe=function(b,c){const d=this.channels[b].indexOf(c);-1<d&&this.channels[b].splice(d,1),0===this.channels[b].length&&delete this.channels[b]},a.prototype.publish=function(b,c){if(void 0!==this.channels[b])for(let d=0;d<this.channels[b].length;d++)this.channels[b][d](c)},a}();
+"use strict";
 
-// renderer
-// https://github.com/henrysun918/rpk/blob/master/modules/rpk-renderer/rpk-renderer.js
-"use strict";window.rpk===void 0&&(window.rpk={}),window.rpk.Renderer=function(){function Renderer(){}return Renderer.prototype.renderTemplateToSelector=function(a,b,c){const d=renderTemplate(b,c);setInnerHTMLToSelector(a,d)},Renderer.prototype.renderTemplate=function(templateHTML){const templateVarRegex=/{[^{]+}/gi;return templateHTML.replace(templateVarRegex,function(substring){const expression=substring.slice(1,-1);return eval("dataObj."+expression)})},Renderer.prototype.setInnerHTMLToSelector=function(a,b){const c=document.querySelectorAll(a);for(let d=0;d<c.length;d++)c[d].innerHTML=b},Renderer}();
+if (window.rpk === undefined) {
+    window.rpk = {};
+}
 
-// playlist
-// https://github.com/henrysun918/rpk/blob/master/modules/rpk-playlist/rpk-playlist.js
-"use strict";window.rpk===void 0&&(window.rpk={}),window.rpk.Playlist=function(){function a(){this.previousStack=[],this.nextStack=[],this.currentStack=[]}return a.prototype.addToQueue=function(b){this.nextStack.unshift(b)},a.prototype.addToNext=function(b){this.nextStack.push(b)},a.prototype.hasPrevious=function(){return 0<this.previousStack.length},a.prototype.hasCurrent=function(){return 0<this.currentStack.length},a.prototype.hasNext=function(){return 0<this.nextStack.length},a.prototype.goToNext=function(){return this.hasCurrent()&&this.previousStack.push(this.currentStack.pop()),this.hasNext()&&this.currentStack.push(this.nextStack.pop()),this.getCurrent()},a.prototype.goToPrevious=function(){return this.hasCurrent()&&this.nextStack.push(this.currentStack.pop()),this.hasPrevious()&&this.currentStack.push(this.previousStack.pop()),this.getCurrent()},a.prototype.getCurrent=function(){return this.currentStack[0]},a}();
+window.rpk.EventHub = (function() {
+    function EventHub() {
+        this.channels = {};
+    }
+
+    EventHub.prototype.subscribe = function(channel, subscriber) {
+        if (this.channels[channel] === undefined) {
+            this.channels[channel] = [];
+        }
+        this.channels[channel].push(subscriber);
+    }
+
+    EventHub.prototype.unsubscribe = function(channel, subscriber) {
+        const i = this.channels[channel].indexOf(subscriber);
+        if (i > -1) {
+            this.channels[channel].splice(i, 1);
+        }
+
+        if (this.channels[channel].length === 0) {
+            delete this.channels[channel];
+        }
+    }
+
+    EventHub.prototype.publish = function(channel, event) {
+        if (this.channels[channel] === undefined) {
+            return;
+        }
+
+        let handlers = []; // save all handlers to prevent one handler deletes another by unsubscribing
+
+        for (let i = 0; i < this.channels[channel].length; i++) {
+            handlers.push(this.channels[channel][i]);
+        }
+
+        for (let i = 0; i < handlers.length; i++) {
+            handlers[i](event);
+        }
+    }
+
+    return EventHub;
+})();
+
+//playlist
+"use strict";
+
+if (window.rpk === undefined) {
+    window.rpk = {};
+}
+
+window.rpk.Playlist = (function () {
+    function CursorPlaylist() {
+        this.previousStack = []; // most rencent item on top
+        this.nextStack = []; // most imminent item on top
+        this.currentStack = []; // size = 1
+    }
+
+    CursorPlaylist.prototype.addToQueue = function (track) {
+        this.nextStack.unshift(track);
+    };
+
+    CursorPlaylist.prototype.addToNext = function (track) {
+        this.nextStack.push(track);
+    };
+
+    CursorPlaylist.prototype.hasPrevious = function () {
+        return this.previousStack.length > 0;
+    };
+
+    CursorPlaylist.prototype.hasCurrent = function () {
+        return this.currentStack.length > 0;
+    }
+
+    CursorPlaylist.prototype.hasNext = function () {
+        return this.nextStack.length > 0;
+    };
+
+    CursorPlaylist.prototype.goToNext = function () {
+        if (this.hasCurrent()) {
+            this.previousStack.push(this.currentStack.pop());
+        }
+
+        if (this.hasNext()) {
+            this.currentStack.push(this.nextStack.pop());
+        }
+
+        return this.getCurrent();
+    };
+
+    CursorPlaylist.prototype.goToPrevious = function () {
+        if (this.hasCurrent()) {
+            this.nextStack.push(this.currentStack.pop());
+        }
+
+        if (this.hasPrevious()) {
+            this.currentStack.push(this.previousStack.pop());
+        }
+
+        return this.getCurrent();
+    };
+
+    CursorPlaylist.prototype.getCurrent = function () {
+        return this.currentStack[0];
+    };
+    return CursorPlaylist;
+}());
+
+//renderer
+"use strict";
+
+if (window.rpk === undefined) {
+    window.rpk = {};
+}
+
+window.rpk.Renderer = (function() {
+    function Renderer() {}
+
+    Renderer.prototype.renderTemplateToSelector = function (selector, templateHTML, dataObj) {
+        const renderedHTML = renderTemplate(templateHTML, dataObj);
+        setInnerHTMLToSelector(selector, renderedHTML);
+    }
+    
+    Renderer.prototype.renderTemplate = function (templateHTML, dataObj) {
+        const replacer = function (substring, offset) {
+            const expression = substring.slice(1, -1);
+            return eval('dataObj.' + expression);
+        };
+        const templateVarRegex = /{[^{]+}/gi;
+        return templateHTML.replace(templateVarRegex, replacer);   
+    }
+    
+    Renderer.prototype.setInnerHTMLToSelector = function (selector, innerHTML) {
+        const anchors = document.querySelectorAll(selector);
+        for (let i = 0; i < anchors.length; i++) {
+            anchors[i].innerHTML = innerHTML;
+        }
+    }
+
+    return Renderer
+})();

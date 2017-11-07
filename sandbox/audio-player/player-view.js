@@ -16,14 +16,18 @@ const CursorPlayerView = (function() {
                     '<div class="cs-player__time" id="cs-progress-current-time"></div>' +
                     '<div class="cs-player__titled-progress-bar">' +
                         '<div id="cs-progress-title"></div>' +
-                        '<div class="cs-progress-click-zone" onpointerdown="eventHub.publish(CS_POINTER_DOWN, event)">' +
-                            '<div class="cs-progress-bar" id="cs-progress-bar">' +
-                                '<div class="cs-progress-bar__knob" id="cs-progress-bar__knob"></div>' +
+                        '<div class="cs-click-zone" onpointerdown="eventHub.publish(CS_PROGRESS_POINTER_DOWN, event)">' +
+                            '<div class="cs-progress-bar cs-range-bar" id="cs-progress-bar">' +
+                                '<div class="cs-range-bar__knob" id="cs-progress-bar__knob"></div>' +
                             '</div>' +
                         '</div>'+
                     '</div>' +
                     '<div class="cs-player__time" id="cs-progress-duration"></div>' +
                 '</div>' +
+                '<div class="cs-click-zone" onpointerdown="eventHub.publish(CS_VOLUME_POINTER_DOWN, event)">' +
+                    '<div class="cs-volume-bar cs-range-bar" id="cs-volume-bar"><div>' +
+                '</div>'
+            '</div>'+
             '</div>';
 
         this.renderer.setInnerHTMLToSelector(selector, htmlTemplate);
@@ -37,6 +41,8 @@ const CursorPlayerView = (function() {
         this.title = this.rootElement.querySelector('#cs-progress-title');
         this.progressBar = this.rootElement.querySelector('#cs-progress-bar');
         this.progressBarKnob = this.rootElement.querySelector('#cs-progress-bar__knob');
+        this.volume = this.rootElement.querySelector('#cs-player-volume');
+        this.volumeBar = this.rootElement.querySelector('#cs-volume-bar');
 
         // init view
         this.update({
@@ -45,13 +51,15 @@ const CursorPlayerView = (function() {
             duration: 0,
             title: '',
             percentage: 0,
+            volume: 1,
             hasPrevious: false,
             hasCurrent: false,
             hasNext: false,
         });
 
         // hookup events
-        eventHub.subscribe(CS_POINTER_DOWN, this.startSeek.bind(this));
+        eventHub.subscribe(CS_PROGRESS_POINTER_DOWN, this.startSeek.bind(this));
+        eventHub.subscribe(CS_VOLUME_POINTER_DOWN, this.startVolumeChange.bind(this));
         eventHub.subscribe(CS_PLAYER_STATE_CHANGE, this.update.bind(this));
     }
 
@@ -83,11 +91,16 @@ const CursorPlayerView = (function() {
         if (delta.hasNext !== undefined) {
             this.nextButton.disabled = !delta.hasNext;
         }
+        if (delta.volume !== undefined) {
+            this.volumeBar.style.backgroundImage = 'linear-gradient(to right, purple, purple ' + 100 * delta.volume + '%, grey ' + 100 * delta.volume + '%, grey)';
+        }
     }
 
-    CursorPlayerView.prototype.emitSeek = function (event) {
-        const seekPercentage = event.offsetX / this.progressBar.offsetWidth;
-        eventHub.publish(CS_SEEK, seekPercentage);
+    CursorPlayerView.prototype.emitSeek = function (event, channelName, element) {
+        const length = event.clientX - element.getBoundingClientRect().left;
+
+        const seekPercentage = length / element.offsetWidth;
+        eventHub.publish(channelName, seekPercentage);
     }
 
     CursorPlayerView.prototype.getMinutesAndSecondsFromTime = function (timeInSeconds) {
@@ -104,14 +117,44 @@ const CursorPlayerView = (function() {
     }
 
     CursorPlayerView.prototype.startSeek = function (event) {
-        this.emitSeek(event);
+        this.emitSeek(event, CS_SEEK, this.progressBar);
 
         let pointermoveHandler;
         let mouseupHandler;
-        document.addEventListener('pointermove', pointermoveHandler = this.emitSeek.bind(this));
+        let interruptHandler;
+
+        document.addEventListener('pointermove', pointermoveHandler = function(event) {
+            this.emitSeek(event, CS_SEEK, this.progressBar);
+        }.bind(this));
 
         document.addEventListener('pointerup', mouseupHandler = function(event) {
-            this.emitSeek(event);
+            this.emitSeek(event, CS_SEEK, this.progressBar);
+            document.removeEventListener('pointermove', pointermoveHandler);
+            document.removeEventListener('pointerup', mouseupHandler);
+            eventHub.unsubscribe(CS_SEEK_INTERRUPT, interruptHandler);
+        }.bind(this));
+
+        eventHub.subscribe(CS_SEEK_INTERRUPT, interruptHandler = function() {
+            document.removeEventListener('pointermove', pointermoveHandler);
+            document.removeEventListener('pointerup', mouseupHandler);
+            eventHub.unsubscribe(CS_SEEK_INTERRUPT, interruptHandler);
+        });
+    }
+
+    CursorPlayerView.prototype.startVolumeChange = function (event) {
+        this.emitSeek(event, CS_VOLUME_CHANGE, this.volumeBar);
+
+        let pointermoveHandler;
+        let mouseupHandler;
+        let interruptHandler;
+
+        document.addEventListener('pointermove', pointermoveHandler = function(event) {
+            this.emitSeek(event, CS_VOLUME_CHANGE, this.volumeBar);
+        }.bind(this));
+
+
+        document.addEventListener('pointerup', mouseupHandler = function(event) {
+            this.emitSeek(event, CS_VOLUME_CHANGE, this.volumeBar);
             document.removeEventListener('pointermove', pointermoveHandler);
             document.removeEventListener('pointerup', mouseupHandler);
         }.bind(this));
