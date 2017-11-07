@@ -19,6 +19,6 @@ const playerView = new CursorPlayerView('#rendered-player');
 const playlistController = new CursorPlaylistControl(playerController);
 
 function load(index) {
-    if (index === 1) eventHub.publish(CS_REQUEST_NEW_TRACK, {title: 'title 1', src: 'https://cursors.azurewebsites.net/cursors.mp3'});
+    if (index === 1) eventHub.publish(CS_REQUEST_NEW_TRACK, {title: 'title 1', src: './tracks/track-1.mp3'});
     if (index === 2) eventHub.publish(CS_REQUEST_NEW_TRACK, {title: 'title 2', src: './tracks/track-2.mp3'});
 }
