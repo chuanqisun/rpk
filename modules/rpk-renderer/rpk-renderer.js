@@ -9,7 +9,7 @@ window.rpk.Renderer = (function() {
 
     Renderer.prototype.renderTemplateToSelector = function (selector, templateHTML, dataObj) {
         const renderedHTML = renderTemplate(templateHTML, dataObj);
-        setInnerHTMLToSelector(selector, renderedHTML);
+        this.setInnerHTMLToSelector(selector, renderedHTML);
     }
     
     Renderer.prototype.renderTemplate = function (templateHTML, dataObj) {

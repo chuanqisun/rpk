@@ -9,8 +9,8 @@
   "author": "Chuanqi Sun",
   "license": "MIT",
   "dependencies": {
-    "rpk-event-hub": "0.0.4",
-    "rpk-playlist": "0.0.1",
-    "rpk-renderer": "0.0.3"
+    "rpk-event-hub": "0.0.6",
+    "rpk-playlist": "0.0.2",
+    "rpk-renderer": "0.0.4"
   }
 }
