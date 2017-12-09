@@ -1,22 +1,16 @@
-"use strict";
-
-if (window.rpk === undefined) {
-    window.rpk = {};
-}
-
-window.rpk.EventHub = (function() {
-    function EventHub() {
+class EventHub {
+    constructor() {
         this.channels = {};
     }
 
-    EventHub.prototype.subscribe = function(channel, subscriber) {
+    subscribe(channel, subscriber) {
         if (this.channels[channel] === undefined) {
             this.channels[channel] = [];
         }
         this.channels[channel].push(subscriber);
     }
 
-    EventHub.prototype.unsubscribe = function(channel, subscriber) {
+    unsubscribe(channel, subscriber) {
         const i = this.channels[channel].indexOf(subscriber);
         if (i > -1) {
             this.channels[channel].splice(i, 1);
@@ -27,7 +21,7 @@ window.rpk.EventHub = (function() {
         }
     }
 
-    EventHub.prototype.publish = function(channel, event) {
+    publish(channel, event) {
         if (this.channels[channel] === undefined) {
             return;
         }
@@ -42,6 +36,4 @@ window.rpk.EventHub = (function() {
             handlers[i](event);
         }
     }
-
-    return EventHub;
-})();
+}
