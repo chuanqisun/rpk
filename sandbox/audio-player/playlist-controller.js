@@ -6,6 +6,7 @@ const CursorPlaylistControl = (function () {
         eventHub.subscribe(CS_REQUEST_NEW_TRACK, this.onPlayNew.bind(this));
         eventHub.subscribe(CS_REQUEST_PREVIOUS_TRACK, this.onPlayPrevious.bind(this));
         eventHub.subscribe(CS_REQUEST_NEXT_TRACK, this.onPlayNext.bind(this));
+        eventHub.subscribe(CS_REQUEST_AUTO_NEXT, this.onAutoPlayNext.bind(this));
     }
 
     CursorPlaylistControl.prototype.onPlayNew = function (track) {
@@ -43,6 +44,12 @@ const CursorPlaylistControl = (function () {
             hasNext: this.playlist.hasNext(),
             title: track.title,
         });
+    };
+
+    CursorPlaylistControl.prototype.onAutoPlayNext = function () {
+        if (this.playlist.hasNext()) {
+            this.onPlayNext();
+        }
     };
 
     CursorPlaylistControl.prototype.updateView = function(delta) {

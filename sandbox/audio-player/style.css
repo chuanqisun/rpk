@@ -24,22 +24,29 @@
     pointer-events: none;
 }
 
-.cs-progress-click-zone {
+.cs-click-zone {
     padding: 12px 0;
     cursor: pointer;
     touch-action: none;
     user-select: none;
 }
 
-.cs-progress-bar {
-    width: 50vw;
+.cs-range-bar {
     height: 8px;
     border-radius: 4px;
     background-color: grey;
     will-change: background-image;
 }
 
-.cs-progress-bar__knob {
+.cs-progress-bar {
+    width: 50vw;
+}
+
+.cs-volume-bar {
+    width: 10vw;
+}
+
+.cs-range-bar__knob {
     pointer-events: none;
     display: inline-block;
     width: 16px;

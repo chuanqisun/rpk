@@ -1,6 +1,6 @@
 {
   "name": "rpk-playlist",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "a playlist data structure",
   "repository": {
     "type": "git",
