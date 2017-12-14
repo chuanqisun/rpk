@@ -1,4 +1,4 @@
-class EventHub {
+class PubSub {
     constructor() {
         this.channels = {};
     }
@@ -21,7 +21,7 @@ class EventHub {
         }
     }
 
-    publish(channel, event) {
+    publish(channel, ...arg) {
         if (this.channels[channel] === undefined) {
             return;
         }
@@ -33,7 +33,7 @@ class EventHub {
         }
 
         for (let i = 0; i < handlers.length; i++) {
-            handlers[i](event);
+            handlers[i](...arg);
         }
     }
 }

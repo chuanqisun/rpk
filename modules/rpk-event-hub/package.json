@@ -1,6 +1,6 @@
 {
   "name": "rpk-event-hub",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "rapid-prototyping-kit: event-hub",
   "repository": {
     "type": "git",
